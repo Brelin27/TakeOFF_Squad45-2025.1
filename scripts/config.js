@@ -1,7 +1,7 @@
 // Configurações globais da aplicação
 
 // URL base da API
-const API_BASE_URL = 'https://takeoff-squad45-2025-1.onrender.com';
+const API_BASE_URL = 'https://takeoff-teste-backend.onrender.com';
 //const API_BASE_URL = 'http://localhost:8080'; // URL base da API local
 
 // Rotas específicas
