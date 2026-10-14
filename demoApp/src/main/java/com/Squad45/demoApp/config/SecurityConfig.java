@@ -1,5 +1,7 @@
 package com.Squad45.demoApp.config;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
@@ -36,7 +38,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .cors(org.springframework.security.config.Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/login").permitAll()
@@ -52,25 +54,34 @@ public class SecurityConfig {
     }
     
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        // Só para testes. Especifique origens específicas em vez de "*"
-        configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:5500", 
-            "http://127.0.0.1:5500", 
-            "http://localhost:3000", 
-            "https://takeoff-squad45-2025-1.onrender.com",
-            "https://antoniopatricio22.github.io"
+    public CorsConfigurationSource corsConfigurationSource(
+        @Value("${FRONTEND_URL:http://localhost:5500}") String frontendUrl) {
 
-        ));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
-        configuration.setAllowCredentials(true);
-        
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+    CorsConfiguration configuration = new CorsConfiguration();
+
+    configuration.setAllowedOrigins(Arrays.asList(
+        frontendUrl,
+        "http://localhost:5500",
+        "http://127.0.0.1:5500",
+        "http://localhost:3000"
+    ));
+
+    configuration.setAllowedMethods(Arrays.asList(
+        "GET", "POST", "PUT", "DELETE", "OPTIONS"
+    ));
+
+    configuration.setAllowedHeaders(Arrays.asList(
+        "Authorization", "Content-Type", "X-Requested-With"
+    ));
+
+    configuration.setAllowCredentials(false);
+
+    UrlBasedCorsConfigurationSource source =
+        new UrlBasedCorsConfigurationSource();
+
+    source.registerCorsConfiguration("/**", configuration);
+    return source;
+}
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
